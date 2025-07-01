@@ -1,4 +1,4 @@
-import { use, useState, useCallback, useEffect} from "react";
+import { use, useState, useCallback, useEffect, useRef} from "react";
 import "./App.css";
 
 function App() {
@@ -7,6 +7,8 @@ function App() {
     const [charAllowed, setCharAllowed] = useState(false);
     const [password, setPassword] = useState("");
 
+
+    const passwordRef = useRef(null);
 
     const passwordGenerator = useCallback(() =>{
         let pass = "";
@@ -27,6 +29,15 @@ function App() {
         setPassword(pass);
     },[length, numberAllowed, charAllowed, setPassword]);
 
+
+    const copyPasswordToClipboard = useCallback(() => {
+        passwordRef.current?.select(); // jo bhi password select hua ho usse highlight kar dega
+        passwordRef.current?.setSelectionRange(0, 16); // ye ek range hai ki kitna password select karna hai
+        window.navigator.clipboard.writeText(password) // ye command hai jo clipboard me copy karega
+        window.alert("Copied");
+    }, [password]) 
+
+
     useEffect(() => {
         passwordGenerator();
     }, [length, numberAllowed, charAllowed, passwordGenerator]);
@@ -44,8 +55,11 @@ function App() {
             value={password}
             placeholder="password"
             readOnly
+            ref={passwordRef}
           />
-          <button className="bg-blue-500 text-white px-4 py-2 ml-2 rounded">
+          <button 
+          onClick={copyPasswordToClipboard}
+          className="bg-blue-500 text-white px-4 py-2 ml-2 rounded">
             copy
           </button>
         </div>
